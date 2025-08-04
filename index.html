@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kanban Task Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-gray-50 font-sans">
+    <div class="container mx-auto px-4 py-8">
+        <!-- Developer Room Code Section -->
+        <div class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div class="flex items-center gap-2">
+                <span class="font-semibold text-gray-700">This Room Code:</span>
+                <span id="currentRoomCode" class="font-mono bg-gray-200 px-3 py-1 rounded text-indigo-700 select-all">45A-5XE</span>
+                <button id="copyRoomCode" class="ml-2 px-2 py-1 text-xs bg-indigo-600 text-white rounded hover:bg-indigo-700 transition">Copy</button>
+            </div>
+            <div class="flex items-center gap-2">
+                <input id="roomCodeInput" type="text" maxlength="7" placeholder="Enter room code (e.g. 45A-5XE)" class="border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-mono w-40" />
+                <button id="joinRoomBtn" class="px-3 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Enter Room Code</button>
+                <button id="createRoomBtn" class="px-3 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition">Create a Room</button>
+            </div>
+        </div>
+        <!-- Header -->
+        <header class="flex flex-col md:flex-row justify-between items-center mb-8">
+            <div class="flex items-center mb-4 md:mb-0">
+                <i class="fas fa-tasks text-indigo-600 text-3xl mr-3"></i>
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Kanban Task Manager</h1>
+            </div>
+            <div class="flex space-x-2">
+                <button id="openTaskModal" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center transition">
+                    <i class="fas fa-plus mr-2"></i> New Task
+                </button>
+        <!-- New Task Modal -->
+        <div id="taskModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-50 hidden">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
+                <button id="closeTaskModal" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700 text-2xl">&times;</button>
+                <h2 class="text-xl font-bold mb-4 text-gray-800">Add New Task</h2>
+                <form id="taskForm" class="space-y-4">
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Title</label>
+                        <input type="text" id="taskTitle" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Description</label>
+                        <textarea id="taskDesc" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" rows="2" required></textarea>
+                    </div>
+                    <div class="flex space-x-4">
+                        <div class="flex-1">
+                            <label class="block text-gray-700 font-medium mb-1">Priority</label>
+                            <select id="taskPriority" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+                                <option value="low">Low</option>
+                                <option value="medium">Medium</option>
+                                <option value="high">High</option>
+                            </select>
+                        </div>
+                        <div class="flex-1">
+                            <label class="block text-gray-700 font-medium mb-1">Due Date</label>
+                            <input type="date" id="taskDate" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" required>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1">Tags</label>
+                        <select id="taskTags" class="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-400" multiple>
+                            <option value="Frontend">Frontend</option>
+                            <option value="Backend">Backend</option>
+                            <option value="Meeting">Meeting</option>
+                            <option value="Discussion">Discussion</option>
+                        </select>
+                        <small class="text-gray-400">Hold Ctrl (Windows) or Cmd (Mac) to select multiple tags.</small>
+                    </div>
+                    <div class="flex justify-end">
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">Add Task</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+                <button class="bg-white hover:bg-gray-100 text-gray-700 border border-gray-300 px-4 py-2 rounded-lg flex items-center transition">
+                    <i class="fas fa-filter mr-2"></i> Filter
+                </button>
+            </div>
+        </header>
+
+        <!-- Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-blue-500">
+                <p class="text-gray-500 text-sm">Total Tasks</p>
+                <h3 class="text-2xl font-bold text-gray-800">24</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-green-500">
+                <p class="text-gray-500 text-sm">Completed</p>
+                <h3 class="text-2xl font-bold text-gray-800">8</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-yellow-500">
+                <p class="text-gray-500 text-sm">In Progress</p>
+                <h3 class="text-2xl font-bold text-gray-800">12</h3>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm border-l-4 border-red-500">
+                <p class="text-gray-500 text-sm">Overdue</p>
+                <h3 class="text-2xl font-bold text-gray-800">4</h3>
+            </div>
+        </div>
+
+        <!-- Kanban Board -->
+        <div class="kanban-container flex flex-col md:flex-row space-y-4 md:space-y-0 md:space-x-4">
+            <!-- Backlog Column -->
+            <div class="kanban-column bg-gray-100 rounded-lg p-4 flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-semibold text-gray-700 flex items-center">
+                        <span class="w-3 h-3 bg-gray-400 rounded-full mr-2"></span>
+                        Backlog
+                    </h2>
+                    <span class="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">5</span>
+                </div>
+                <div class="space-y-3" id="backlog-column">
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-medium" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">Design new dashboard UI</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Medium</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Create wireframes for the new analytics dashboard</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span>Due: Tomorrow</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-low" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">Update documentation</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Low</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Add new API endpoints to developer docs</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span>Due: Next week</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/68.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- To Do Column -->
+            <div class="kanban-column bg-gray-100 rounded-lg p-4 flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-semibold text-gray-700 flex items-center">
+                        <span class="w-3 h-3 bg-blue-400 rounded-full mr-2"></span>
+                        To Do
+                    </h2>
+                    <span class="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">7</span>
+                </div>
+                <div class="space-y-3" id="todo-column">
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-high" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">Fix login authentication bug</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">High</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Users reporting 500 errors when logging in</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span>Due: Today</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/22.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-medium" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">Implement dark mode</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Medium</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Add theme toggle and dark color scheme</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span>Due: Friday</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/65.jpg" alt="User">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/75.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- In Progress Column -->
+            <div class="kanban-column bg-gray-100 rounded-lg p-4 flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-semibold text-gray-700 flex items-center">
+                        <span class="w-3 h-3 bg-yellow-400 rounded-full mr-2"></span>
+                        In Progress
+                    </h2>
+                    <span class="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">8</span>
+                </div>
+                <div class="space-y-3" id="progress-column">
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-high" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">Mobile responsive fixes</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-red-100 text-red-800 px-2 py-1 rounded-full">High</span>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">Frontend</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Layout issues on mobile devices need to be addressed</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span>Due: Tomorrow</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/46.jpg" alt="User">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/63.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-medium" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">Database optimization</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Medium</span>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Backend</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Improve query performance for reporting module</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-alt mr-1"></i>
+                                <span>Due: Next Monday</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/32.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Done Column -->
+            <div class="kanban-column bg-gray-100 rounded-lg p-4 flex-1">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="font-semibold text-gray-700 flex items-center">
+                        <span class="w-3 h-3 bg-green-400 rounded-full mr-2"></span>
+                        Done
+                    </h2>
+                    <span class="bg-gray-200 text-gray-600 text-xs font-medium px-2 py-1 rounded-full">4</span>
+                </div>
+                <div class="space-y-3" id="done-column">
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-low opacity-70" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">User profile page redesign</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">Low</span>
+                                <span class="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">Frontend</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Updated layout and added new fields</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-check mr-1 text-green-500"></i>
+                                <span class="text-green-500">Completed</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/women/44.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="task-card bg-white p-4 rounded-lg shadow-xs border-l-4 priority-medium opacity-70" draggable="true">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="font-medium text-gray-800">API rate limiting</h3>
+                            <div class="flex space-x-1">
+                                <span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">Medium</span>
+                                <span class="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded-full">Backend</span>
+                            </div>
+                        </div>
+                        <p class="text-gray-500 text-sm mb-3">Implemented rate limiting for public endpoints</p>
+                        <div class="flex justify-between items-center text-xs text-gray-400">
+                            <div class="flex items-center">
+                                <i class="far fa-calendar-check mr-1 text-green-500"></i>
+                                <span class="text-green-500">Completed</span>
+                            </div>
+                            <div class="flex -space-x-1">
+                                <img class="w-6 h-6 rounded-full border-2 border-white" src="https://randomuser.me/api/portraits/men/75.jpg" alt="User">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Modal open/close logic
+        const openBtn = document.getElementById('openTaskModal');
+        const closeBtn = document.getElementById('closeTaskModal');
+        const modal = document.getElementById('taskModal');
+        openBtn.addEventListener('click', () => modal.classList.remove('hidden'));
+        closeBtn.addEventListener('click', () => modal.classList.add('hidden'));
+        window.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.add('hidden');
+        });
+
+        // Room code logic
+        function generateRoomCode() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            let code = '';
+            for (let i = 0; i < 3; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            code += '-';
+            for (let i = 0; i < 3; i++) code += chars.charAt(Math.floor(Math.random() * chars.length));
+            return code;
+        }
+        const currentRoomCodeSpan = document.getElementById('currentRoomCode');
+        const copyRoomCodeBtn = document.getElementById('copyRoomCode');
+        const roomCodeInput = document.getElementById('roomCodeInput');
+        const joinRoomBtn = document.getElementById('joinRoomBtn');
+        const createRoomBtn = document.getElementById('createRoomBtn');
+
+        // Copy room code
+        copyRoomCodeBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(currentRoomCodeSpan.textContent);
+            copyRoomCodeBtn.textContent = 'Copied!';
+            setTimeout(() => copyRoomCodeBtn.textContent = 'Copy', 1200);
+        });
+
+        // Enter room code
+        joinRoomBtn.addEventListener('click', () => {
+            const code = roomCodeInput.value.trim().toUpperCase();
+            if (/^[A-Z0-9]{3}-[A-Z0-9]{3}$/.test(code)) {
+                currentRoomCodeSpan.textContent = code;
+                roomCodeInput.value = '';
+                alert('Joined room: ' + code);
+            } else {
+                alert('Please enter a valid 6-character room code (e.g. 45A-5XE)');
+            }
+        });
+
+        // Create a new room
+        createRoomBtn.addEventListener('click', () => {
+            const newCode = generateRoomCode();
+            currentRoomCodeSpan.textContent = newCode;
+            alert('Created new room: ' + newCode);
+        });
+    </script>
+
+    <footer class="mt-12 py-6 bg-gray-100 border-t text-center text-gray-500 text-sm">
+        &copy; 2025 Shahid Khan. All rights reserved. | Licensed for personal and educational use only.
+    </footer>
+</body>
+</html>
